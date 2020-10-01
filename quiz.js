@@ -43,7 +43,7 @@ class Card{
 
         //Now append a Div that will contain the answer options to the card
         let div_answers = document.createElement("div")
-        div_answers.id = "answer-options"+(this.card_id)
+        div_answers.id = "answer-options-"+(this.card_id)
         div_answers.classList.add("answer-options")
         cardDiv.appendChild(div_answers)
 
@@ -62,6 +62,8 @@ class Card{
         confirmAnswerBtn.classList.add("grab_name_button")
         confirmAnswerBtn.classList.add("confirm_button")
         confirmAnswerBtn.id = "confirm-"+this.card_id
+        confirmAnswerBtn.setAttribute("disabled", "true")
+
         cardDiv.appendChild(confirmAnswerBtn)
 
 
@@ -75,7 +77,9 @@ class Card{
                 checkbox.setAttribute("type", "checkbox")
                 checkbox.id = "checkbox-"+checkboxIdArray[index]
                 checkbox.classList.add("checkbox_card_"+this.card_id)
+                checkbox.classList.add("checkbox")
                 tempDiv.appendChild(checkbox)
+                div.id = "option-"+this.card_id+"-"+checkboxIdArray[index]
                 div.classList.add("option-item")
                 div.innerHTML = tempDiv.innerHTML
                 div.innerHTML += answer.slice(-1)+") "
@@ -186,6 +190,7 @@ class Quiz{
             .then(response => response.json())
             .then(data => {
                 data.forEach((cardData,iData)=>{
+                    console.log(cardData)
                     card = new Card(cardData, iData)
                     card.printCardOnScreen();
                     this.cards.push(card)
@@ -199,13 +204,29 @@ class Quiz{
     }
 
     checkPlayersAnswer(card,i){
+        //Will only enable the Confirm Button if checkbox is checked
+        let allCheckboxes = Array.from(document.getElementsByClassName("checkbox"))
         let confirmBtn = document.getElementById("confirm-"+(i+1))
         let cardDiv = document.getElementById("card-"+(i+1))
-        let array = []
+        //Add an event listener to all checkboxes on event "change"
+        allCheckboxes.forEach(chk=> {
+            chk.addEventListener("change",(e)=>{
+                let cardNumber = e.target.parentNode.id.split("-")[1]
+                let cardCheckboxes = Array.from(document.getElementsByClassName("checkbox_card_"+cardNumber))
+                //If any checkbox is checked then we will set the confirm button's disable attribute to "true"
+                if (cardCheckboxes.map(cx => cx.checked).includes(true) && cardNumber==(i+1)){
+                    confirmBtn.removeAttribute("disabled")
+                    console.log(confirmBtn)
+                }
+
+               
+            })
+        })
+
         confirmBtn.addEventListener("click",(e)=>{
             let clicked_card = e.target.id.split("-")[1]
             let checkbox = Array.from(document.getElementsByClassName("checkbox_card_"+clicked_card))
-            
+
             let markedCheckboxes = checkbox.filter(box => box.checked === true).map(element=>element.id.split("-")[1]);
             
             //The answer will only be correct if the user chooses all the correct answers!
@@ -216,9 +237,22 @@ class Quiz{
 
             console.log(markedCheckboxes,card.right_answer)
             if (isAnswerCorrect){
-                cardDiv.classList.add("write-answer")
+                for (let rightAns of card.right_answer){
+                    let rightAnsDiv = document.getElementById("option-"+card.card_id+"-"+rightAns)
+                    rightAnsDiv.classList.add("user-right-answer")
+                }
+                cardDiv.classList.add("card-write-answer")
+
             }else {
-                cardDiv.classList.add("wrong-answer")
+                for (let rightAns of card.right_answer){
+                    let rightAnsDiv = document.getElementById("option-"+card.card_id+"-"+rightAns)
+                    rightAnsDiv.classList.add("right-answer")
+                }
+                for (let wrongAns of markedCheckboxes){
+                    let wrongAnsDiv = document.getElementById("option-"+card.card_id+"-"+wrongAns)
+                    wrongAnsDiv.classList.add("user-wrong-answer")
+                }
+                cardDiv.classList.add("card-wrong-answer")
             }
             checkbox.map(chck => chck.remove())
             confirmBtn.setAttribute("disabled", "true")

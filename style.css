@@ -265,7 +265,8 @@ footer {
 }
 
 .option-item{
-    margin: 0 0 20px 10px;
+    margin: 0 0 15px 10px;
+    padding: 5px;
 }
 
 .category{
@@ -284,8 +285,11 @@ footer {
     font-size: 24px;
     font-weight: 700;
 }
+.confirm_button:disabled{
+    opacity: 0.25;
+}
 
-.write-answer{
+.card-write-answer{
 
     -webkit-animation-name: change-to-green;
     -webkit-animation-timing-function: ease;
@@ -318,7 +322,7 @@ footer {
         opacity: 0.5;
     }
 }
-.wrong-answer{
+.card-wrong-answer{
 
     -webkit-animation-name: change-to-red;
     -webkit-animation-timing-function: ease;
@@ -359,4 +363,18 @@ footer {
     background-color: #080905;
     opacity: 0.5;
 
+}
+
+.right-answer{
+    background: #fafafa;
+}
+
+.user-right-answer{
+    border: 2px solid #9FD745;
+    opacity: 1!important;
+}
+
+.user-wrong-answer{
+    border: 2px solid #E61616;
+    opacity: 1!important;
 }
