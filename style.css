@@ -219,6 +219,17 @@ footer {
 
 }
 
+.points-area{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding-top: 10px;
+}
+
+.points-area p{
+    font-weight: 900
+}
+
 .fa-thumbs-down {
     color:#E61616;
     font-size: 64px;
@@ -229,6 +240,24 @@ footer {
     margin-bottom: 20px;
 }
 
+.not-answered{
+    color: lightgray;
+    opacity: 0.25;
+    margin-left: 10px;
+    font-size: 40px;
+}
+.right-answer-icon{
+    color: #9FD745;
+    opacity: 1;
+    margin-left: 10px;
+    font-size: 40px;
+}
+.wrong-answer-icon{
+    color: #E61616;
+    opacity: 1;
+    margin-left: 10px;
+    font-size: 40px;
+}
 
 .container{
     display: flex;
@@ -377,4 +406,14 @@ footer {
 .user-wrong-answer{
     border: 2px solid #E61616;
     opacity: 1!important;
+}
+
+
+.points-span{
+    font-size: 50px;
+    margin: 0 0 5px 10px;
+    background: #9FD745;
+    border-radius: 50%;
+    padding:5px 20px;
+    color: #ffffff;
 }
