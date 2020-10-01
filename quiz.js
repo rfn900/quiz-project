@@ -60,10 +60,12 @@ class Card{
         this.category = cardData.tags[0].name
         this.right_answer = this.rightAnswers(cardData.correct_answers) 
         this.isMultipleRightAnswers = cardData.multiple_correct_answers
+        this.top_card = 1
         
     }
 
     printCardOnScreen(){
+        
         let cardsContainer = document.getElementById("container")
         cardsContainer.classList.add("container")
 
@@ -71,8 +73,13 @@ class Card{
         let cardDiv = document.createElement("div")
         cardDiv.id = "card-"+(this.card_id)
         cardDiv.classList.add("card")
+        cardDiv.classList.add("card-"+this.card_id)
         cardsContainer.appendChild(cardDiv)
 
+        let sheet = document.createElement('style')
+        sheet.innerHTML += ".card-"+this.card_id+" {z-index: "+ (11-this.card_id) +";}";
+        document.body.appendChild(sheet);
+        
         //Append the Question Header to the card
         let h2 = document.createElement("h2")
         h2.innerHTML = "Question "+(this.card_id)
@@ -129,6 +136,57 @@ class Card{
                 div.innerHTML += this.htmlEscape(this.answers[answer])
                 div_answers.appendChild(div)
             }
+        })
+        this.toggleBetweenCards()
+    }
+
+    checkTopCard(iteration){
+        this.top_card += iteration
+    }
+
+    toggleBetweenCards(){
+        let rightArrow = document.getElementById("right-arrow")
+        let leftArrow = document.getElementById("left-arrow")
+
+        rightArrow.addEventListener("click",()=>{
+
+            let index = this.top_card % 10
+            index < 0 ? index += 9 : index
+            
+            Array.from(document.getElementsByClassName("card"))
+            .forEach(element=>{
+                element.classList.remove("card-1")
+            })
+
+            let nextCard = document.getElementById("card-"+(index+1))
+            nextCard.classList.add("card-1")
+            let topCard = Array.from(document.getElementsByClassName("card-"+1))[0]
+            this.top_card = topCard.id.split("-")[1]
+            console.log(this.top_card)
+            if (index != 0) {
+                nextCard.classList.remove("card-"+(index+1))   
+            }
+            //this.checkTopCard(+1)
+        })
+
+        leftArrow.addEventListener("click", ()=>{
+            
+            Array.from(document.getElementsByClassName("card"))
+            .forEach((element, index)=>{
+                element.classList.remove("card-1")
+                element.classList.remove("card-"+(index+1))
+            })
+            let nextCard
+            if (this.top_card == 1){
+                nextCard = document.getElementById("card-10")
+                nextCard.classList.remove("card-10")    
+            }
+            else nextCard = document.getElementById("card-"+(this.top_card-1))
+            nextCard.classList.add("card-1")
+            let topCard = Array.from(document.getElementsByClassName("card-"+1))[0]
+            this.top_card = topCard.id.split("-")[1]
+            console.log(this.top_card)
+            
         })
     }
 
@@ -209,6 +267,7 @@ class Quiz{
 
             
             this.displayQuestions(player)
+           
         }
     }
 
@@ -217,7 +276,7 @@ class Quiz{
         let startBox = document.getElementById("start_box")
         let startBoxBack = document.getElementById("start_box_back")
         
-        startQuizBtn.addEventListener("click", ()=>{
+        startQuizBtn.addEventListener("click", async ()=>{
             player.setPointsArea()
             startBox.remove()
             startBoxBack.remove()
@@ -230,57 +289,64 @@ class Quiz{
             url += API_KEY 
             url += "&limit="+numberOfQuestions
             let card = {}
-             fetch(url)
+            await fetch(url) 
             .then(response => response.json())
             .then(data => {
                 data.forEach((cardData,iData)=>{
-                    console.log(cardData)
+                    
                     card = new Card(cardData, iData)
                     card.printCardOnScreen();
                     this.cards.push(card)
-                    this.checkPlayersAnswer(card,iData,player)
+                   
                 })   
             }) 
             
 
-
+            this.checkPlayersAnswer(player)
         })
     }
 
-    checkPlayersAnswer(card,i,player){
+    
+    checkPlayersAnswer(player){
         //Will only enable the Confirm Button if checkbox is checked
         let allCheckboxes = Array.from(document.getElementsByClassName("checkbox"))
-        let confirmBtn = document.getElementById("confirm-"+(i+1))
+        let confirmBtn = Array.from(document.getElementsByClassName("confirm_button"))
+        console.log(confirmBtn)
+        console.log(this.cards.length)
+
         //Add an event listener to all checkboxes on event "change"
         allCheckboxes.forEach(chk=> {
             chk.addEventListener("change",(e)=>{
                 let cardNumber = e.target.parentNode.id.split("-")[1]
                 let cardCheckboxes = Array.from(document.getElementsByClassName("checkbox_card_"+cardNumber))
                 //If any checkbox is checked then we will set the confirm button's disable attribute to "true"
-                if (cardCheckboxes.map(cx => cx.checked).includes(true) && cardNumber==(i+1)){
-                    confirmBtn.removeAttribute("disabled")
-                    console.log(confirmBtn)
+                if (cardCheckboxes.map(cx => cx.checked).includes(true)){
+                    
+                    confirmBtn[cardNumber-1].removeAttribute("disabled")
+                    
                 }               
             })
         })
 
-        confirmBtn.addEventListener("click",(e)=>{
-            let clicked_card = e.target.id.split("-")[1]
-            let checkbox = Array.from(document.getElementsByClassName("checkbox_card_"+clicked_card))
-            let markedCheckboxes = checkbox.filter(box => box.checked === true).map(element=>element.id.split("-")[1]);
-            
-            this.correct(markedCheckboxes, card, i, clicked_card, player)
+        confirmBtn.forEach(btn => {
+            btn.addEventListener("click",(e)=>{
+                let clicked_card = e.target.id.split("-")[1]
+                console.log(clicked_card)
+                let checkbox = Array.from(document.getElementsByClassName("checkbox_card_"+clicked_card))
+                let markedCheckboxes = checkbox.filter(box => box.checked === true).map(element=>element.id.split("-")[1]);
+                
+                this.correct(markedCheckboxes, this.cards[clicked_card-1], player)
 
-            checkbox.map(chck => chck.remove())
-            confirmBtn.setAttribute("disabled", "true")
-            //confirmBtn.classList.add("btn-disabled")
-            confirmBtn.remove()
+                checkbox.map(chck => chck.remove())
+                btn.setAttribute("disabled", "true")
+                //confirmBtn.classList.add("btn-disabled")
+                btn.remove()
+             })
         })
     }
-
-    correct(markedCheckboxes, card, i, clicked_card, player){
-        let cardDiv = document.getElementById("card-"+(i+1))
-        console.log(i+1)
+    correct(markedCheckboxes, card, player){
+        let cardDiv = document.getElementById("card-"+(card.card_id))
+        console.log(card)
         //The answer will only be correct if the user chooses all the correct answers!
         let isAnswerCorrect = Array.isArray(markedCheckboxes) &&
         Array.isArray(card.right_answer) &&
@@ -294,7 +360,7 @@ class Quiz{
                 rightAnsDiv.classList.add("user-right-answer")
             }
             cardDiv.classList.add("card-write-answer")
-            player.printCurrentPoints(true,clicked_card)
+            player.printCurrentPoints(true,card.card_id)
 
         }else {
             for (let rightAns of card.right_answer){
@@ -306,7 +372,7 @@ class Quiz{
                 wrongAnsDiv.classList.add("user-wrong-answer")
             }
             cardDiv.classList.add("card-wrong-answer")
-            player.printCurrentPoints(false,clicked_card)
+            player.printCurrentPoints(false,card.card_id)
         }
     }
 }

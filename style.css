@@ -50,7 +50,7 @@ nav {
 
 main {
     display: flex;
-    justify-content: center;
+    justify-content: space-evenly;
     align-items: center;
     -webkit-perspective: 1200px;
     -moz-perspective: 1200px;
@@ -62,7 +62,7 @@ main {
 }
 
 .stretch {
-    height: 360vh;
+    height: 80vh;
 }
 
 .start_game_box{
@@ -260,19 +260,22 @@ footer {
 }
 
 .container{
+
     display: flex;
     flex-wrap: wrap;
-    justify-content: space-evenly;
-    align-items: center;
+    justify-content: center;
+    align-items:center;
     height: inherit;
     margin: 40px 0;
+    
 }
 
 .card{
-    position: relative;
+    position: absolute;
+    margin: 0;
     padding: 0 20px;
     width: 40vw;
-    min-height: 60vh;
+    height: 70vh;
     background:#fafafa;
     box-shadow: 0 4px 12px 0 rgba(0, 0, 0, 0.1), 0 6px 12px 0 rgba(0, 0, 0, 0.1);
 
@@ -343,12 +346,10 @@ footer {
 @keyframes change-to-green {
     from {
         background-color: none;
-        opacity: 1;
 
     }
     to {
-        background-color: rgb(159, 215, 69,0.75);
-        opacity: 0.5;
+        background-color: #9FD745;
     }
 }
 .card-wrong-answer{
@@ -376,12 +377,10 @@ footer {
 @keyframes change-to-red {
     from {
         background-color: none;
-        opacity: 1;
 
     }
     to {
-        background-color:hsla(0, 83%, 49%, 0.76);
-        opacity: 0.5;
+        background-color:#E61616;
     }
 }
 
@@ -399,21 +398,26 @@ footer {
 }
 
 .user-right-answer{
-    border: 2px solid #9FD745;
+    border: 2px solid #ffffff;
     opacity: 1!important;
 }
 
 .user-wrong-answer{
-    border: 2px solid #E61616;
+    border: 2px solid #000000;
     opacity: 1!important;
 }
 
 
 .points-span{
-    font-size: 50px;
+    font-size: 1.5em;
     margin: 0 0 5px 10px;
     background: #9FD745;
     border-radius: 50%;
     padding:5px 20px;
     color: #ffffff;
+}
+
+.arrow{
+    color: #9FD745;
+    font-size: 68px;
 }
