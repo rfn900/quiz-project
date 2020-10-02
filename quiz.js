@@ -1,8 +1,7 @@
 class Player{
     constructor(name = ""){
         this.name = name,
-        this.points = 0,
-        this.chosenNumberOfQuestions = 10
+        this.points = 0
     }
     printCurrentPoints(isRight, clicked_card_id){
         
@@ -23,7 +22,7 @@ class Player{
         p.innerHTML = this.points
         
     }
-    setPointsArea(){
+    setPointsArea(numberOfQuestions){
         let footer = document.getElementById("footer")
         let div = document.createElement("div")
         div.id = "footer-points"
@@ -34,7 +33,7 @@ class Player{
         span.innerHTML = this.name
         div.appendChild(span)
         div.appendChild(p)
-        for (let i=0; i<this.chosenNumberOfQuestions; i++){
+        for (let i=0; i<numberOfQuestions; i++){
             let icon = document.createElement("i")
             icon.id = "point-icon-"+(i+1)
             icon.classList.add("fa-thumbs-up")
@@ -65,7 +64,7 @@ class Card{
         
     }
 
-    printCardOnScreen(){
+    printCardOnScreen(numberOfQuestions){
         
         let cardsContainer = document.getElementById("container")
         cardsContainer.classList.add("container")
@@ -138,55 +137,62 @@ class Card{
                 div_answers.appendChild(div)
             }
         })
-        this.toggleBetweenCards()
+        this.toggleBetweenCards(numberOfQuestions)
     }
 
-    checkTopCard(iteration){
-        this.top_card += iteration
-    }
 
-    toggleBetweenCards(){
+    toggleBetweenCards(numberOfQuestions){
         let rightArrow = document.getElementById("right-arrow")
         let leftArrow = document.getElementById("left-arrow")
 
         rightArrow.addEventListener("click",()=>{
 
-            let index = this.top_card % 10
-            index < 0 ? index += 9 : index
+            let index = this.top_card % numberOfQuestions
+            console.log(index, this.top_card, numberOfQuestions)
+            //index < 0 ? index += 9 : index
             
+            //Clean all the cards from the special high z-index class 'card-1'
             Array.from(document.getElementsByClassName("card"))
             .forEach(element=>{
                 element.classList.remove("card-1")
             })
 
+            //Start by adding the class with the highest index to the next card in the list
             let nextCard = document.getElementById("card-"+(index+1))
             nextCard.classList.add("card-1")
+
+            //Identify the card on top at every iteration
             let topCard = Array.from(document.getElementsByClassName("card-"+1))[0]
             this.top_card = topCard.id.split("-")[1]
-            //console.log(this.top_card)
+
+            //Clean the next card of its original class
             if (index != 0) {
                 nextCard.classList.remove("card-"+(index+1))   
             }
-            //this.checkTopCard(+1)
+            
         })
 
         leftArrow.addEventListener("click", ()=>{
             
+            //Clean all the cards from the special high z-index class 'card-1'            
             Array.from(document.getElementsByClassName("card"))
             .forEach((element, index)=>{
                 element.classList.remove("card-1")
                 element.classList.remove("card-"+(index+1))
             })
+
+            //If the top card is the 1st card and we press left, We set the last card to be next on queue
             let nextCard
             if (this.top_card == 1){
-                nextCard = document.getElementById("card-10")
-                nextCard.classList.remove("card-10")    
+                nextCard = document.getElementById("card-"+numberOfQuestions)
+                nextCard.classList.remove("card-"+numberOfQuestions)    
             }
-            else nextCard = document.getElementById("card-"+(this.top_card-1))
+            else nextCard = document.getElementById("card-"+(this.top_card-1)) //Otherwise just put the card before it
+
             nextCard.classList.add("card-1")
+
             let topCard = Array.from(document.getElementsByClassName("card-"+1))[0]
             this.top_card = topCard.id.split("-")[1]
-            //console.log(this.top_card)
             
         })
     }
@@ -211,15 +217,13 @@ class Card{
 
 class Quiz{
     constructor(){
-        this.numberOfQuestions = this.setNumberOfQuestions;
+        this.numberOfQuestions = 1;
         this.cards = [];
         this.questionsAnswered = 0;
         this.numberOfRounds = 1;
     }
 
-    setNumberOfQuestions(){
-        return 0
-    }
+    
 
     registerPlayer(){
         let nameInput = document.getElementById("name-input").value
@@ -258,25 +262,47 @@ class Quiz{
             
             let h2 = document.createElement("h2")
             h2.innerHTML = "Good Luck, "+ player.name + "!"
-            
-            let button = document.createElement("button")
-            button.id = "start-quiz"
-            button.classList.add("grab_name_button")
-            button.innerHTML = "Start The Quiz!"
-            
+                   
             div.appendChild(h2)
             div.appendChild(i)
-            div.appendChild(button)
             
-            let startQuizBtn = document.getElementById("start-quiz")
-            startQuizBtn.addEventListener("click", () =>{
-                this.displayQuestions(player)
-            })
+            this.setNumberOfQuestions(div,player)
         }
     }
 
-    async displayQuestions(player){
+    setNumberOfQuestions(div, player){
+        let button = document.createElement("button")
+        button.id = "start-quiz"
+        button.classList.add("grab_name_button")
+        button.innerHTML = "Start The Quiz!"
         
+        let inputDiv = document.createElement("div")
+        let span = document.createElement("span")
+        span.innerHTML = "How Many Quiz Cards?"
+        let input = document.createElement("input")
+        input.id = "number-of-cards-input"
+        inputDiv.classList.add("for-number-input")
+        input.setAttribute("type","number")
+        input.setAttribute("min", "5")
+        input.setAttribute("max", "10")
+        input.setAttribute("value", "10")
+        inputDiv.appendChild(span)
+        inputDiv.appendChild(input)
+        div.appendChild(inputDiv)
+        div.appendChild(button)
+        player.chosenNumberOfQuestions = this.numberOfQuestions;
+
+        let startQuizBtn = document.getElementById("start-quiz")
+            startQuizBtn.addEventListener("click", () =>{
+                this.numberOfQuestions = input.value
+                console.log("aqui", input.value)
+                this.displayQuestions(player)
+                
+            })
+        
+    }
+
+    async displayQuestions(player){
             let startBox = document.getElementById("start_box")
             let startBoxBack = document.getElementById("start_box_back")
             let footerPOints = document.getElementById("footer-points")
@@ -292,14 +318,13 @@ class Quiz{
             
             }
             console.log(this.numberOfRounds)
-            player.setPointsArea()
+            player.setPointsArea(this.numberOfQuestions)
             
 
-            let numberOfQuestions = 10
             let API_KEY = "7i21EngxshaQ6wp9IgJVwzkoidfOxGMVsg3j2ma5"
             let url = "https://quizapi.io/api/v1/questions?apiKey="
             url += API_KEY 
-            url += "&limit="+numberOfQuestions
+            url += "&limit="+this.numberOfQuestions
             let card = {}
             await fetch(url) 
             .then(response => response.json())
@@ -307,7 +332,7 @@ class Quiz{
                 data.forEach((cardData,iData)=>{
                    // console.log(data)
                     card = new Card(cardData, iData)
-                    card.printCardOnScreen();
+                    card.printCardOnScreen(this.numberOfQuestions);
                     this.cards.push(card)
                    
                 })   
@@ -395,7 +420,7 @@ class Quiz{
         
         this.questionsAnswered++
                 
-        if (this.questionsAnswered == 10){
+        if (this.questionsAnswered == this.numberOfQuestions){
             let main = document.getElementById("main")
             main.innerHTML = ""
             let div = document.createElement("div")
@@ -405,26 +430,58 @@ class Quiz{
             // container.innerHTML = ""
             div.classList.add("game-summary-div")
             let h2 = document.createElement("h2")
-            h2.innerHTML = "Your Total Score is: " + player.points
+            h2.innerHTML = player.name+", Your Total Score is: " + player.points
             childDiv.appendChild(h2)
             div.appendChild(childDiv)
+            div.className = "restart"
             let restartBtn = document.createElement("button")
             restartBtn.id = "start-quiz"
             restartBtn.innerHTML = "Restart the Game"
+            restartBtn.className = "grab_name_button_reset"
+            
+            let inputDiv = document.createElement("div")
+            let span = document.createElement("span")
+            span.innerHTML = "Wanna Play a New Game? How Many Quiz Cards?"
+            let input = document.createElement("input")
+            input.id = "number-of-cards-input"
+            inputDiv.classList.add("for-number-input-reset")
+            input.setAttribute("type","number")
+            input.setAttribute("min", "5")
+            input.setAttribute("max", "10")
+            input.setAttribute("value", "10")
+            inputDiv.appendChild(span)
+            inputDiv.appendChild(input)
+
+            let message = ''
+            if (player.points < 70 && player.points > 40){
+                message = '"You Are On the Right Track! Keep Studying"'
+            }else if(player.points<40){
+                message = '"Ya Dumb!"'
+            }else if(player.points>70){
+                message = '"You Are Basically a Pro! Respect."'
+            }
+            let divMessage = document.createElement("div")
+            divMessage.className = "message"
+            divMessage.innerHTML = message
+            div.appendChild(divMessage)
+            div.appendChild(inputDiv)
             div.appendChild(restartBtn)
             main.appendChild(div)
 
+
             restartBtn.addEventListener("click", e =>{
-                this.reset(player)
+                this.numberOfQuestions = input.value
+                this.resetTheGame(player)
                 this.displayQuestions(player)
             })   
-
         }
         
         return -1
     }
 
-    reset(player){
+    resetTheGame(player){
+    
+
         this.cards = []
         player.points = 0
         this.numberOfRounds++
