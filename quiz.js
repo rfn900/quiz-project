@@ -26,6 +26,7 @@ class Player{
     setPointsArea(){
         let footer = document.getElementById("footer")
         let div = document.createElement("div")
+        div.id = "footer-points"
         div.classList.add("points-area")
         let p = document.createElement("p")
         p.innerHTML = ", Here Are Your Current Points:"
@@ -162,7 +163,7 @@ class Card{
             nextCard.classList.add("card-1")
             let topCard = Array.from(document.getElementsByClassName("card-"+1))[0]
             this.top_card = topCard.id.split("-")[1]
-            console.log(this.top_card)
+            //console.log(this.top_card)
             if (index != 0) {
                 nextCard.classList.remove("card-"+(index+1))   
             }
@@ -185,7 +186,7 @@ class Card{
             nextCard.classList.add("card-1")
             let topCard = Array.from(document.getElementsByClassName("card-"+1))[0]
             this.top_card = topCard.id.split("-")[1]
-            console.log(this.top_card)
+            //console.log(this.top_card)
             
         })
     }
@@ -212,6 +213,8 @@ class Quiz{
     constructor(){
         this.numberOfQuestions = this.setNumberOfQuestions;
         this.cards = [];
+        this.questionsAnswered = 0;
+        this.numberOfRounds = 1;
     }
 
     setNumberOfQuestions(){
@@ -264,24 +267,33 @@ class Quiz{
             div.appendChild(h2)
             div.appendChild(i)
             div.appendChild(button)
-
             
-            this.displayQuestions(player)
-           
+            let startQuizBtn = document.getElementById("start-quiz")
+            startQuizBtn.addEventListener("click", () =>{
+                this.displayQuestions(player)
+            })
         }
     }
 
-    displayQuestions(player){
-        let startQuizBtn = document.getElementById("start-quiz")
-        let startBox = document.getElementById("start_box")
-        let startBoxBack = document.getElementById("start_box_back")
+    async displayQuestions(player){
         
-        startQuizBtn.addEventListener("click", async ()=>{
+            let startBox = document.getElementById("start_box")
+            let startBoxBack = document.getElementById("start_box_back")
+            let footerPOints = document.getElementById("footer-points")
+            if (this.numberOfRounds==1){
+                startBox.remove()
+                startBoxBack.remove()
+                let main = document.getElementsByTagName("main")
+                main[0].classList.add("stretch")                
+            }else if (this.numberOfRounds>1) {
+                footerPOints.remove()
+                let game_summary = document.getElementById("game-summary")
+                game_summary.remove()
+            
+            }
+            console.log(this.numberOfRounds)
             player.setPointsArea()
-            startBox.remove()
-            startBoxBack.remove()
-            let main = document.getElementsByTagName("main")
-            main[0].classList.add("stretch")
+            
 
             let numberOfQuestions = 10
             let API_KEY = "7i21EngxshaQ6wp9IgJVwzkoidfOxGMVsg3j2ma5"
@@ -293,7 +305,7 @@ class Quiz{
             .then(response => response.json())
             .then(data => {
                 data.forEach((cardData,iData)=>{
-                    
+                   // console.log(data)
                     card = new Card(cardData, iData)
                     card.printCardOnScreen();
                     this.cards.push(card)
@@ -303,7 +315,7 @@ class Quiz{
             
 
             this.checkPlayersAnswer(player)
-        })
+        
     }
 
     
@@ -311,9 +323,7 @@ class Quiz{
         //Will only enable the Confirm Button if checkbox is checked
         let allCheckboxes = Array.from(document.getElementsByClassName("checkbox"))
         let confirmBtn = Array.from(document.getElementsByClassName("confirm_button"))
-        console.log(confirmBtn)
-        console.log(this.cards.length)
-
+        
         //Add an event listener to all checkboxes on event "change"
         allCheckboxes.forEach(chk=> {
             chk.addEventListener("change",(e)=>{
@@ -324,14 +334,16 @@ class Quiz{
                     
                     confirmBtn[cardNumber-1].removeAttribute("disabled")
                     
-                }               
+                }else confirmBtn[cardNumber-1].setAttribute("disabled", "true")                
             })
         })
 
         confirmBtn.forEach(btn => {
+
             btn.addEventListener("click",(e)=>{
+
                 let clicked_card = e.target.id.split("-")[1]
-                console.log(clicked_card)
+                
                 let checkbox = Array.from(document.getElementsByClassName("checkbox_card_"+clicked_card))
                 let markedCheckboxes = checkbox.filter(box => box.checked === true).map(element=>element.id.split("-")[1]);
                 
@@ -346,7 +358,7 @@ class Quiz{
     }
     correct(markedCheckboxes, card, player){
         let cardDiv = document.getElementById("card-"+(card.card_id))
-        console.log(card)
+        //console.log(card)
         //The answer will only be correct if the user chooses all the correct answers!
         let isAnswerCorrect = Array.isArray(markedCheckboxes) &&
         Array.isArray(card.right_answer) &&
@@ -361,10 +373,12 @@ class Quiz{
             }
             cardDiv.classList.add("card-write-answer")
             player.printCurrentPoints(true,card.card_id)
+            this.endOfTheQuizGame(player)
 
         }else {
             for (let rightAns of card.right_answer){
                 let rightAnsDiv = document.getElementById("option-"+card.card_id+"-"+rightAns)
+                console.log(card)
                 rightAnsDiv.classList.add("right-answer")
             }
             for (let wrongAns of markedCheckboxes){
@@ -373,6 +387,71 @@ class Quiz{
             }
             cardDiv.classList.add("card-wrong-answer")
             player.printCurrentPoints(false,card.card_id)
+            this.endOfTheQuizGame(player)
         }
+    }
+
+    endOfTheQuizGame(player){
+        
+        this.questionsAnswered++
+                
+        if (this.questionsAnswered == 10){
+            let main = document.getElementById("main")
+            main.innerHTML = ""
+            let div = document.createElement("div")
+            div.id = "game-summary"
+            let childDiv = document.createElement("div")
+           
+            // container.innerHTML = ""
+            div.classList.add("game-summary-div")
+            let h2 = document.createElement("h2")
+            h2.innerHTML = "Your Total Score is: " + player.points
+            childDiv.appendChild(h2)
+            div.appendChild(childDiv)
+            let restartBtn = document.createElement("button")
+            restartBtn.id = "start-quiz"
+            restartBtn.innerHTML = "Restart the Game"
+            div.appendChild(restartBtn)
+            main.appendChild(div)
+
+            restartBtn.addEventListener("click", e =>{
+                this.reset(player)
+                this.displayQuestions(player)
+            })   
+
+        }
+        
+        return -1
+    }
+
+    reset(player){
+        this.cards = []
+        player.points = 0
+        this.numberOfRounds++
+        this.questionsAnswered = 0;
+        let main = document.getElementById("main")
+        let container = document.createElement("div")
+        container.id = "container"
+        
+        let right_arrow = document.createElement("div")
+        let left_arrow = document.createElement("div")
+        right_arrow.classList.add("arrow")
+        left_arrow.classList.add("arrow")
+        right_arrow.id = "right-arrow"
+        left_arrow.id = "left-arrow"
+
+        
+        let iRight = document.createElement("i")
+        let iLeft = document.createElement("i")
+        iRight.classList.add("fa-chevron-circle-right")
+        iRight.classList.add("fas")
+        iLeft.classList.add("fa-chevron-circle-left")
+        iLeft.classList.add("fas")
+        right_arrow.appendChild(iRight)
+        left_arrow.appendChild(iLeft)
+        
+        main.appendChild(left_arrow)
+        main.appendChild(container)
+        main.appendChild(right_arrow)
     }
 }

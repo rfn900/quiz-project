@@ -421,3 +421,7 @@ footer {
     color: #9FD745;
     font-size: 68px;
 }
+
+.ta-bort{
+    display:none;
+}
