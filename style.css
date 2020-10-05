@@ -285,7 +285,7 @@ footer {
     justify-content: center;
     align-items:center;
     height: inherit;
-    margin: 40px 0;
+    margin: 20px 0;
     
 }
 
@@ -319,10 +319,24 @@ footer {
     flex-direction: column;
 }
 
-.option-item{
+/**.option-item{
+    text-align: left;
+    position: relative;
     margin: 0 0 15px 10px;
     padding: 5px;
-}
+}**/
+
+.option-item{
+    display: block;
+    position: relative;
+    padding-left: 5px;
+    margin-bottom: 0;
+    cursor: pointer;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+  }
 
 .category{
     position: absolute;
@@ -502,3 +516,76 @@ footer {
     cursor: pointer;
     max-width: 300px;
 }
+
+.center-text {
+    text-align: center;
+}
+
+.checkmark {
+    position: absolute;
+    top: 0;
+    left: -4px;
+    height: 25px;
+    width: 25px;
+    background-color: #ffffff;
+    border: 1px solid #ccc;
+  }
+
+.option-item input:checked ~ .checkmark {
+    background-color: #9FD745;
+  }
+
+  /*.option-item:hover input ~ .checkmark {
+    background-color: #ccc;
+  }*/
+  
+  .checkmark:after {
+    content: "";
+    position: absolute;
+    display: none;
+  }
+  
+  /* Show the checkmark when checked */
+  .option-item input:checked ~ .checkmark:after {
+    display: block;
+  }
+  
+  /* Style the checkmark/indicator */
+  .option-item .checkmark:after {
+    left: 9px;
+    top: 5px;
+    width: 5px;
+    height: 10px;
+    border: solid #ffffff;
+    border-width: 0 3px 3px 0;
+    -webkit-transform: rotate(45deg);
+    -ms-transform: rotate(45deg);
+    transform: rotate(45deg);
+  }
+
+  .loader {
+    border: 16px solid #f3f3f3;
+    border-radius: 50%;
+    border-top: 16px solid #9FD745;
+    width: 120px;
+    height: 120px;
+    -webkit-animation: spin 2s linear infinite; /* Safari */
+    animation: spin 2s linear infinite;
+  }
+  
+  /* Safari */
+  @-webkit-keyframes spin {
+    0% { -webkit-transform: rotate(0deg); }
+    100% { -webkit-transform: rotate(360deg); }
+  }
+  
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+  .center-container{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
