@@ -11,7 +11,6 @@ class Card{
     }
 
     printCardOnScreen(numberOfQuestions){
-        console.log("aqui")
         let cardsContainer = document.getElementById("container")
         cardsContainer.classList.add("container")
 
@@ -45,7 +44,7 @@ class Card{
 
         //Append the actual question to the corresponding question Div
         let h3 = document.createElement("h3")
-        h3.innerHTML = this.question //cardData is the Object read from the API
+        h3.innerHTML = this.question 
         div_question.appendChild(h3)
         
         let span = document.createElement("span")
@@ -61,7 +60,6 @@ class Card{
         confirmAnswerBtn.setAttribute("disabled", "true")
 
         cardDiv.appendChild(confirmAnswerBtn)
-
 
         let checkboxIdArray = ["a","b","c","d","e","f","g"]
         //Now append a set of Divs to the answers Div
@@ -89,18 +87,17 @@ class Card{
                 div_answers.appendChild(label)
             }
         })
+
         this.toggleBetweenCards(numberOfQuestions)
     }
-
 
     toggleBetweenCards(numberOfQuestions){
         let rightArrow = document.getElementById("right-arrow")
         let leftArrow = document.getElementById("left-arrow")
 
-        rightArrow.addEventListener("click",()=>{
+        rightArrow.addEventListener("click", () => {
 
             let index = this.top_card % numberOfQuestions
-            //index < 0 ? index += 9 : index
             
             //Clean all the cards from the special high z-index class 'card-1'
             Array.from(document.getElementsByClassName("card"))
@@ -123,7 +120,7 @@ class Card{
             
         })
 
-        leftArrow.addEventListener("click", ()=>{
+        leftArrow.addEventListener("click", () => {
             
             //Clean all the cards from the special high z-index class 'card-1'            
             Array.from(document.getElementsByClassName("card"))

@@ -1,10 +1,7 @@
 window.addEventListener("DOMContentLoaded", ()=>{
-    let btn = document.getElementById("submit-btn")
-    let quiz = new Quiz
-   
-    //When the user clicks the submit button, the player is registered
-    //and the Quiz game is initialized
-    btn.addEventListener("click", e => quiz.registerPlayer())
+        
+    //Initialize a new Quiz when the user clicks the submit button
+    document.getElementById("submit-btn").addEventListener("click", e => new Quiz)
 
     
 })
