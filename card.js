@@ -27,7 +27,7 @@ class Card{
         
         //Append the Question Header to the card
         let h2 = document.createElement("h2")
-        h2.innerHTML = "Question "+(this.card_id)
+        h2.innerHTML = "Question "+(this.card_id)+" of "+numberOfQuestions
         cardDiv.appendChild(h2)
 
         //Proceed by appending a Div that will contain the Question to the card
@@ -159,6 +159,6 @@ class Card{
     }
 
     htmlEscape(str){
-        return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
+        return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/!/g, '&excl;')
     }
 }
