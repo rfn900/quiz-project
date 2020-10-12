@@ -4,7 +4,7 @@ class Player{
         this.points = 0
     }
     printCurrentPoints(isRight, clicked_card_id){
-        
+        //This method keeps the current player points updated on the screen
         if (isRight){
             let icon = document.getElementById("point-icon-"+clicked_card_id)
             icon.classList.remove("not-answered")
@@ -23,6 +23,8 @@ class Player{
         
     }
     setPointsArea(numberOfQuestions){
+        //This method initializes the particular area where the 
+        //current player points will be displayed
         let footer = document.getElementById("footer")
         let div = document.createElement("div")
         div.id = "footer-points"

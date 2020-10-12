@@ -8,6 +8,7 @@ class Quiz{
     }   
 
     registerPlayer(){
+        //This method controls the player's name input and registers a new Player
         let nameInput = document.getElementById("name-input").value;
         let startBox = document.getElementById("start_box");
         let startBoxBack = document.getElementById("start_box_back")
@@ -34,6 +35,7 @@ class Quiz{
             div.appendChild(i)
             div.appendChild(p)
         }else{
+            //Create an instance of the class Player if the user enters a valid player name
             let player = new Player(nameInput)
             let div = document.createElement("div")
             div.classList.add("back_box_err")
@@ -54,38 +56,38 @@ class Quiz{
     }
 
     setNumberOfQuestions(div, player){
+        //This method sets the number of questions in a give quiz game
+        let button = document.createElement("button")
+        button.id = "start-quiz"
+        button.classList.add("grab_name_button")
+        button.innerHTML = "Start The Quiz!"
+        
+        let inputDiv = document.createElement("div")
+        let span = document.createElement("span")
+        span.innerHTML = "How Many Quiz Cards?"
+        let input = document.createElement("input")
+        input.id = "number-of-cards-input"
+        inputDiv.classList.add("for-number-input")
+        input.setAttribute("type","number")
+        input.setAttribute("min", "5")
+        input.setAttribute("max", "10")
+        input.setAttribute("value", "10")
+        inputDiv.appendChild(span)
+        inputDiv.appendChild(input)
+        div.appendChild(inputDiv)
+        div.appendChild(button)
+        player.chosenNumberOfQuestions = this.numberOfQuestions;
 
-            let button = document.createElement("button")
-            button.id = "start-quiz"
-            button.classList.add("grab_name_button")
-            button.innerHTML = "Start The Quiz!"
-            
-            let inputDiv = document.createElement("div")
-            let span = document.createElement("span")
-            span.innerHTML = "How Many Quiz Cards?"
-            let input = document.createElement("input")
-            input.id = "number-of-cards-input"
-            inputDiv.classList.add("for-number-input")
-            input.setAttribute("type","number")
-            input.setAttribute("min", "5")
-            input.setAttribute("max", "10")
-            input.setAttribute("value", "10")
-            inputDiv.appendChild(span)
-            inputDiv.appendChild(input)
-            div.appendChild(inputDiv)
-            div.appendChild(button)
-            player.chosenNumberOfQuestions = this.numberOfQuestions;
-
-            let startQuizBtn = document.getElementById("start-quiz")
-            
-            startQuizBtn.addEventListener("click", () => {
+        let startQuizBtn = document.getElementById("start-quiz")
+        
+        startQuizBtn.addEventListener("click", () => {
             let valueFromUser = input.value;
             this.controlNumberOfQuestions(player, valueFromUser, button, inputDiv)
         })
     }
         
     controlNumberOfQuestions(player, valueFromUser, button, inputDiv){
-
+        //This method controls the number of questions and call the displayQuestion method
         let startBox = document.getElementById("start_box")
         let startBoxBack = document.getElementById("start_box_back")
         let footerPoints = document.getElementById("footer-points")
@@ -150,7 +152,9 @@ class Quiz{
     }   
 
     async displayQuestions(player){
-
+        //This is where we fetch and store the relevant data form the API
+        //For each question, a new instance of the class Card is created
+        //The property quiz.cards contains all Card objects for a specific quiz game
         player.setPointsArea(this.numberOfQuestions)
 
         let API_KEY = "7i21EngxshaQ6wp9IgJVwzkoidfOxGMVsg3j2ma5"
@@ -200,7 +204,7 @@ class Quiz{
                 let checkbox = Array.from(document.getElementsByClassName("checkbox_card_"+clicked_card))
                 let checkmark = Array.from(document.getElementsByClassName("checkmark_card_"+clicked_card))
 
-                //This filter + map combination will return an array with the player's answers such as: [b,c,e]
+                //This filter + map combination will return an array with the player's answers such as: ["b","c","e"]
                 let markedCheckboxes = checkbox.filter(box => box.checked === true).map(element=>element.id.split("-")[1]);
                 
                 //This is the method that will check if the answers are correct. It takes as parameters the player's answers 
